@@ -58,7 +58,7 @@ extension ZodListValidationExtension<T> on EitherZodList<T> {
   /// If the value passed in is null or not.
   EitherZodList<T> notNull({String? message}) {
     return flatMap(
-      (a) => a.value != null ? right(a) : left(message ?? 'list.notNull'),
+      (a) => a.value == null ? left(message ?? 'list.notNull') : right(a),
     );
   }
 }

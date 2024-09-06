@@ -21,18 +21,18 @@ extension ZodDoubleValidationExtension on EitherZodDouble {
   /// If the value is greater than the min value or not.
   EitherZodDouble min(double min, {bool inclusive = false, String? message}) {
     return flatMap(
-      (a) => a.value != null && (inclusive ? a.value! <= min : a.value! < min)
-          ? right(a)
-          : left(message ?? 'double.min'),
+      (a) => a.value != null && (!inclusive ? a.value! <= min : a.value! < min)
+          ? left(message ?? 'double.min')
+          : right(a),
     );
   }
 
   /// If the value is less than the max value or not.
   EitherZodDouble max(double max, {bool inclusive = false, String? message}) {
     return flatMap(
-      (a) => a.value != null && (inclusive ? a.value! >= max : a.value! > max)
-          ? right(a)
-          : left(message ?? 'double.max'),
+      (a) => a.value != null && (!inclusive ? a.value! >= max : a.value! > max)
+          ? left(message ?? 'double.max')
+          : right(a),
     );
   }
 
@@ -57,41 +57,23 @@ extension ZodDoubleValidationExtension on EitherZodDouble {
   /// If the value passed in is null or not.
   EitherZodDouble notNull({String? message}) {
     return flatMap(
-      (a) => a.value != null ? right(a) : left(message ?? 'double.notNull'),
-    );
-  }
-
-  /// If the value is an even number or not.
-  EitherZodDouble even({String? message}) {
-    return flatMap(
-      (a) => a.value != null && a.value!.isEven
-          ? right(a)
-          : left(message ?? 'double.even'),
-    );
-  }
-
-  /// If the value is an odd number or not.
-  EitherZodDouble odd({String? message}) {
-    return flatMap(
-      (a) => a.value != null && a.value!.isOdd
-          ? right(a)
-          : left(message ?? 'double.odd'),
+      (a) => a.value == null ? left(message ?? 'double.notNull') : right(a),
     );
   }
 
   /// If the value is a multiple of the multipleOf value or not.
   EitherZodDouble multipleOf(double multipleOf, {String? message}) {
     return flatMap(
-      (a) => a.value != null && a.value! % multipleOf == 0
-          ? right(a)
-          : left(message ?? 'double.multipleOf'),
+      (a) => a.value != null && a.value! % multipleOf != 0
+          ? left(message ?? 'double.multipleOf')
+          : right(a),
     );
   }
 
   /// If the value is a multiple of the multipleOf value or not.
   EitherZodDouble positive({String? message}) {
     return flatMap(
-      (a) => a.value != null && a.value! > 0
+      (a) => a.value == null || a.value! > 0
           ? right(a)
           : left(message ?? 'double.positive'),
     );
@@ -100,7 +82,7 @@ extension ZodDoubleValidationExtension on EitherZodDouble {
   /// If the value is a multiple of the multipleOf value or not.
   EitherZodDouble negative({String? message}) {
     return flatMap(
-      (a) => a.value != null && a.value! < 0
+      (a) => a.value == null || a.value! < 0
           ? right(a)
           : left(message ?? 'double.negative'),
     );
@@ -109,7 +91,7 @@ extension ZodDoubleValidationExtension on EitherZodDouble {
   /// If the value is a multiple of the multipleOf value or not.
   EitherZodDouble nonnegative({String? message}) {
     return flatMap(
-      (a) => a.value != null && a.value! >= 0
+      (a) => a.value == null || a.value! >= 0
           ? right(a)
           : left(message ?? 'double.nonnegative'),
     );
@@ -118,7 +100,7 @@ extension ZodDoubleValidationExtension on EitherZodDouble {
   /// If the value is a multiple of the multipleOf value or not.
   EitherZodDouble nonpositive({String? message}) {
     return flatMap(
-      (a) => a.value != null && a.value! <= 0
+      (a) => a.value == null || a.value! <= 0
           ? right(a)
           : left(message ?? 'double.nonpositive'),
     );

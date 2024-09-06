@@ -41,7 +41,7 @@ extension ZodStringValidationExtension on EitherZodString {
 
   /// If the length of the value passed in is equal to the length parameter or
   /// not.
-  EitherZodString length(int length, {String? message}) {
+  EitherZodString lengthEqual(int length, {String? message}) {
     return flatMap(
       (a) => a.value != null && a.value!.length != length
           ? left(message ?? 'string.length')
@@ -63,14 +63,10 @@ extension ZodStringValidationExtension on EitherZodString {
   /// If the value passed is a valid URL or not.
   EitherZodString url({String? message}) {
     return flatMap(
-      (a) => a.value != null
-          ? IOEither.tryCatch(
-              () {
-                Uri.parse(a.value!);
-                return a;
-              },
-              (_, __) => message ?? 'string.url',
-            ).run()
+      (a) => a.value != null &&
+              !RegExp(ValidationRegExp.url, caseSensitive: false)
+                  .hasMatch(a.value!)
+          ? left(message ?? 'string.url')
           : right(a),
     );
   }
@@ -81,8 +77,8 @@ extension ZodStringValidationExtension on EitherZodString {
       (a) => a.value != null &&
               !RegExp(ValidationRegExp.uuid, caseSensitive: false)
                   .hasMatch(a.value!)
-          ? right(a)
-          : left(message ?? 'string.uuid'),
+          ? left(message ?? 'string.uuid')
+          : right(a),
     );
   }
 
@@ -91,8 +87,8 @@ extension ZodStringValidationExtension on EitherZodString {
     return flatMap(
       (a) =>
           a.value != null && !RegExp(ValidationRegExp.nanoID).hasMatch(a.value!)
-              ? right(a)
-              : left(message ?? 'string.nanoid'),
+              ? left(message ?? 'string.nanoid')
+              : right(a),
     );
   }
 
@@ -101,8 +97,8 @@ extension ZodStringValidationExtension on EitherZodString {
     return flatMap(
       (a) =>
           a.value != null && !RegExp(ValidationRegExp.cuid).hasMatch(a.value!)
-              ? right(a)
-              : left(message ?? 'string.cuid'),
+              ? left(message ?? 'string.cuid')
+              : right(a),
     );
   }
 
@@ -111,8 +107,8 @@ extension ZodStringValidationExtension on EitherZodString {
     return flatMap(
       (a) =>
           a.value != null && !RegExp(ValidationRegExp.cuid2).hasMatch(a.value!)
-              ? right(a)
-              : left(message ?? 'string.cuid2'),
+              ? left(message ?? 'string.cuid2')
+              : right(a),
     );
   }
 
@@ -121,8 +117,8 @@ extension ZodStringValidationExtension on EitherZodString {
     return flatMap(
       (a) =>
           a.value != null && !RegExp(ValidationRegExp.ulid).hasMatch(a.value!)
-              ? right(a)
-              : left(message ?? 'string.ulid'),
+              ? left(message ?? 'string.ulid')
+              : right(a),
     );
   }
 
@@ -168,8 +164,8 @@ extension ZodStringValidationExtension on EitherZodString {
       (a) => a.value != null &&
               !RegExp(ValidationRegExp.ipv4, caseSensitive: false)
                   .hasMatch(a.value!)
-          ? right(a)
-          : left(message ?? 'string.ipv4'),
+          ? left(message ?? 'string.ipv4')
+          : right(a),
     );
   }
 
@@ -179,8 +175,8 @@ extension ZodStringValidationExtension on EitherZodString {
       (a) => a.value != null &&
               !RegExp(ValidationRegExp.ipv6, caseSensitive: false)
                   .hasMatch(a.value!)
-          ? right(a)
-          : left(message ?? 'string.ipv6'),
+          ? left(message ?? 'string.ipv6')
+          : right(a),
     );
   }
 
@@ -190,15 +186,15 @@ extension ZodStringValidationExtension on EitherZodString {
       (a) => a.value != null &&
               !RegExp(ValidationRegExp.base64, caseSensitive: false)
                   .hasMatch(a.value!)
-          ? right(a)
-          : left(message ?? 'string.base64'),
+          ? left(message ?? 'string.base64')
+          : right(a),
     );
   }
 
   /// If the value passed in is null or not.
   EitherZodString notNull({String? message}) {
     return flatMap(
-      (a) => a.value != null ? right(a) : left(message ?? 'string.notNull'),
+      (a) => a.value == null ? left(message ?? 'string.notNull') : right(a),
     );
   }
 }
@@ -208,6 +204,14 @@ class ValidationRegExp {
   /// Email validation regular expression
   static const email =
       r"^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$";
+
+  /// URL validation regular expression
+  static const url = r'^(https?:\/\/)?' // protocol
+      r'((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|' // domain name
+      r'((\d{1,3}\.){3}\d{1,3}))' // OR ip (v4) address
+      r'(\:\d+)?(\/[-a-z\d%_.~+]*)*' // port and path
+      r'(\?[;&a-z\d%_.~+=-]*)?' // query string
+      r'(\#[-a-z\d_]*)?$';
 
   /// UUID validation regular expression
   static const uuid =
