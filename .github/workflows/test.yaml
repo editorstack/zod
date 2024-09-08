@@ -1,0 +1,16 @@
+name: Zod Test
+run-name: ${{github.actor}} is testing zod
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - uses: dart-lang/setup-dart@v1
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - run: dart pub get
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: dart analyze
+      - run: dart test
+      - run: echo "🍏 This job's status is ${{ job.status }}."
