@@ -30,11 +30,19 @@ extension ZodStringValidationExtension on EitherZodString {
 
   /// If the length of the value passed in is less than the maxLength
   /// parameter or not.
-
   EitherZodString max(int maxLength, {String? message}) {
     return flatMap(
       (a) => a.value != null && a.value!.length > maxLength
           ? left(message ?? 'string.min.length')
+          : right(a),
+    );
+  }
+
+  /// If the value passed in is equal to the value parameter or not.
+  EitherZodString equals(String value, {String? message}) {
+    return flatMap(
+      (a) => a.value != null && a.value! != value
+          ? left(message ?? 'string.equals')
           : right(a),
     );
   }
